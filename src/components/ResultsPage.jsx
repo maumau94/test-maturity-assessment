@@ -109,19 +109,19 @@ const ResultsPage = ({ assessmentResults }) => {
 
   const getMaturityLevel = (score) => {
     if (score >= 70) return { 
-      text: 'Advanced', 
+      text: 'Gevorderd', 
       color: 'bg-gradient-to-r from-green-500 to-green-600',
       textColor: 'text-green-700',
       bgLight: 'bg-green-50' 
     };
     if (score >= 50) return { 
-      text: 'Intermediate', 
+      text: 'Gemiddeld', 
       color: 'bg-gradient-to-r from-yellow-500 to-yellow-600',
       textColor: 'text-yellow-700',
       bgLight: 'bg-yellow-50'
     };
     return { 
-      text: 'Basic', 
+      text: 'Basis', 
       color: 'bg-gradient-to-r from-red-500 to-red-600',
       textColor: 'text-red-700',
       bgLight: 'bg-red-50'
