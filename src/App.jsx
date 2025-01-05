@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
 import LandingPage from './components/LandingPage';
 import LoginPage from './components/LoginPage';
@@ -19,7 +19,6 @@ const LandingPageWrapper = () => {
 
   return (
     <div>
-      <h1>Landing Page</h1> {/* Testcontent */}
       <LandingPage 
         onStartClick={handleStartAssessment} 
         onLoginClick={handleLogin} 
@@ -49,22 +48,26 @@ const TeamInformationWrapper = () => {
   return <TeamInformationPage onSubmit={handleSubmit} />;
 };
 
-const QuestionsWrapper = () => {
+const QuestionsWrapper = ({ setAssessmentResults }) => {
   const navigate = useNavigate();
   
-  const handleSubmit = (answers) => {
-    console.log('Assessment answers:', answers);
+  const handleSubmit = (results) => {
+    console.log('Assessment results:', results);
+    setAssessmentResults(results); // Sla de resultaten op in de state
     navigate('/results');
   };
 
   return <QuestionsPage onSubmit={handleSubmit} />;
 };
 
-const ResultsWrapper = () => {
-  return <ResultsPage />;
+const ResultsWrapper = ({ assessmentResults }) => {
+  return <ResultsPage assessmentResults={assessmentResults} />;
 };
 
 function App() {
+  // State voor de assessment resultaten
+  const [assessmentResults, setAssessmentResults] = useState(null);
+
   return (
     <div className="w-full min-h-screen flex flex-col">
       <Router>
@@ -72,8 +75,14 @@ function App() {
           <Route path="/" element={<LandingPageWrapper />} />
           <Route path="/login" element={<LoginPageWrapper />} />
           <Route path="/team-info" element={<TeamInformationWrapper />} />
-          <Route path="/questions" element={<QuestionsWrapper />} />
-          <Route path="/results" element={<ResultsWrapper />} />
+          <Route 
+            path="/questions" 
+            element={<QuestionsWrapper setAssessmentResults={setAssessmentResults} />} 
+          />
+          <Route 
+            path="/results" 
+            element={<ResultsWrapper assessmentResults={assessmentResults} />} 
+          />
         </Routes>
       </Router>
     </div>

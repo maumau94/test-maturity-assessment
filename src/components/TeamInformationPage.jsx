@@ -10,10 +10,10 @@ const TeamInformationPage = ({ onSubmit }) => {
     customApplications: [],
   });
 
-  const methodologies = ['Agile', 'Waterfall', 'Hybrid'];
+  const methodologies = ['Onbekend','Agile', 'Waterval', 'Hybride'];
   const automationTools = ['Tosca', 'Selenium', 'Worksoft', 'UFT', 'Cucumber', 'Jenkins'];
   const sapProducts = ['SAP Fiori', 'SAP ECC', 'SAP S4/HANA', 'SuccessFactors'];
-  const customApps = ['Web Services/API', 'PDF Files', 'Mainframe Applications', 'Mobile Applications'];
+  const customApps = ['Web Services/API', 'PDF Bestanden', 'Mainframe Applicaties', 'Mobiele Applicaties'];
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -43,45 +43,45 @@ const TeamInformationPage = ({ onSubmit }) => {
         <div className="max-w-3xl w-full">
           <div className="bg-[#1e73ac] rounded-lg shadow-md p-8">
             <div className="text-center mb-8">
-              <h2 className="text-2xl font-bold text-white">Team Information</h2>
-              <p className="text-gray-200 mt-2">Tell us about your testing team and environment</p>
+              <h2 className="text-2xl font-bold text-white">Team Informatie</h2>
+              <p className="text-gray-200 mt-2">Vertel ons wat meer over het testteam en de testomgeving</p>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Team Name */}
               <div>
-                <label className="block text-sm font-medium text-white mb-2">Team Name</label>
+                <label className="block text-sm font-medium text-white mb-2">Naam van het team</label>
                 <input
                   type="text"
                   value={formData.teamName}
                   onChange={(e) => setFormData({ ...formData, teamName: e.target.value })}
                   className="block w-full px-3 py-2 bg-white text-black border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-[#1e73ac] focus:border-[#1e73ac]"
-                  placeholder="Enter team name"
+                  placeholder="Vul team naam in"
                 />
               </div>
 
               {/* Number of Testers */}
               <div>
-                <label className="block text-sm font-medium text-white mb-2">Number of Testers</label>
+                <label className="block text-sm font-medium text-white mb-2">Het aantal testers in het team</label>
                 <input
                   type="number"
                   value={formData.numberOfTesters}
                   onChange={(e) => setFormData({ ...formData, numberOfTesters: e.target.value })}
                   className="block w-full px-3 py-2 bg-white text-black border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-[#1e73ac] focus:border-[#1e73ac]"
-                  placeholder="Enter number of testers"
+                  placeholder="Aantal"
                   min="1"
                 />
               </div>
 
               {/* Methodology */}
               <div>
-                <label className="block text-sm font-medium text-white mb-2">Work Methodology</label>
+                <label className="block text-sm font-medium text-white mb-2">Welke ontwikkelmethodiek gebruiken jullie?</label>
                 <select
                   value={formData.methodology}
                   onChange={(e) => setFormData({ ...formData, methodology: e.target.value })}
                   className="block w-full px-3 py-2 bg-white text-black border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-[#1e73ac] focus:border-[#1e73ac]"
                 >
-                  <option value="">Select methodology</option>
+                  <option value="">Kies methodiek</option>
                   {methodologies.map((method) => (
                     <option key={method} value={method}>
                       {method}
@@ -92,12 +92,12 @@ const TeamInformationPage = ({ onSubmit }) => {
 
               {/* Test Automation Tools */}
               <div>
-                <label className="block text-sm font-medium text-white mb-2">Test Automation Tools</label>
+                <label className="block text-sm font-medium text-white mb-2">Welke testautomation tools gebruiken jullie?</label>
                 <select
                   onChange={(e) => handleAddOption('automationTools', e.target.value)}
                   className="block w-full px-3 py-2 bg-white text-black border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-[#1e73ac] focus:border-[#1e73ac]"
                 >
-                  <option value="">Select a tool</option>
+                  <option value="">Kies tool(s)</option>
                   {automationTools.map((tool) => (
                     <option key={tool} value={tool}>
                       {tool}
@@ -125,12 +125,12 @@ const TeamInformationPage = ({ onSubmit }) => {
 
               {/* SAP Products */}
               <div>
-                <label className="block text-sm font-medium text-white mb-2">SAP Products</label>
+                <label className="block text-sm font-medium text-white mb-2">Welke SAP-producten testen jullie?</label>
                 <select
                   onChange={(e) => handleAddOption('sapProducts', e.target.value)}
                   className="block w-full px-3 py-2 bg-white text-black border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-[#1e73ac] focus:border-[#1e73ac]"
                 >
-                  <option value="">Select a product</option>
+                  <option value="">Kies product(en)</option>
                   {sapProducts.map((product) => (
                     <option key={product} value={product}>
                       {product}
@@ -158,12 +158,12 @@ const TeamInformationPage = ({ onSubmit }) => {
 
               {/* Custom Applications */}
               <div>
-                <label className="block text-sm font-medium text-white mb-2">Custom Applications</label>
+                <label className="block text-sm font-medium text-white mb-2">Welke custom applicaties test het team?</label>
                 <select
                   onChange={(e) => handleAddOption('customApplications', e.target.value)}
                   className="block w-full px-3 py-2 bg-white text-black border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-[#1e73ac] focus:border-[#1e73ac]"
                 >
-                  <option value="">Select an application</option>
+                  <option value="">Kies applicatie(s)</option>
                   {customApps.map((app) => (
                     <option key={app} value={app}>
                       {app}
@@ -195,7 +195,7 @@ const TeamInformationPage = ({ onSubmit }) => {
                   type="submit"
                   className="w-full bg-white text-black py-4 px-8 border border-gray-300 text-lg font-medium hover:bg-[#fc4a32] hover:text-white hover:border-[#fc4a32] transition-all duration-200 focus:outline-none"
                 >
-                  Continue to Assessment
+                  Ga door naar het assessment
                 </button>
               </div>
             </form>

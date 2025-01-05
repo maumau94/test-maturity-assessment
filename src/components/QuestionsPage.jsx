@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { ArrowRight, ArrowLeft, HelpCircle } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const QuestionsPage = ({ onSubmit }) => {
   const questions = [
     {
-      category: "Test Scope",
+      category: "Quality Awareness",
       questions: [
         {
           id: 1,
@@ -45,7 +46,7 @@ const QuestionsPage = ({ onSubmit }) => {
       ]
     },
     {
-      category: "Test Dekking",
+      category: "QA & Testing",
       questions: [
         {
           id: 4,
@@ -87,7 +88,7 @@ const QuestionsPage = ({ onSubmit }) => {
       ]
     },
     {
-      category: "Test Fases",
+      category: "Infrastructuur",
       questions: [
         {
           id: 7,
@@ -97,7 +98,7 @@ const QuestionsPage = ({ onSubmit }) => {
             { text: "Integratie testen", score: 2 },
             { text: "End-to-end testen", score: 3 },
             { text: "Regressie testen", score: 3 },
-            { text: "Unit testen", score: 1 },
+            { text: "Unit testen", score: 3 },
             { text: "Weet ik niet", score: 0 }
           ],
           multiSelect: true
@@ -107,7 +108,7 @@ const QuestionsPage = ({ onSubmit }) => {
           text: "Hoe vaak worden (geautomatiseerde) testen gedraaid?",
           tooltip: "De frequentie van testen is een belangrijke indicator voor continuous testing volwassenheid. Frequenter testen betekent snellere feedback en betere kwaliteit.",
           options: [
-            { text: "Na elke build", score: 3 },
+            { text: "Na elke build", score: 1 },
             { text: "Één keer per release cycle", score: 1 },
             { text: "Wekelijks", score: 2 },
             { text: "Dagelijks", score: 3 },
@@ -146,7 +147,9 @@ const QuestionsPage = ({ onSubmit }) => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState({});
   const [activeTooltip, setActiveTooltip] = useState(null);
+  const [direction, setDirection] = useState(0);
 
+  // Flatten questions array for easier navigation
   const flatQuestions = questions.reduce((acc, category) => [...acc, ...category.questions], []);
   const currentQuestion = flatQuestions[currentQuestionIndex];
 
@@ -174,63 +177,57 @@ const QuestionsPage = ({ onSubmit }) => {
     });
   };
 
-  const handleTooltipClick = (e, id) => {
-    e.preventDefault();
-    setActiveTooltip(activeTooltip === id ? null : id);
+  const handleNext = () => {
+    if (currentQuestionIndex < flatQuestions.length - 1) {
+      setDirection(1);
+      setCurrentQuestionIndex(currentQuestionIndex + 1);
+      setActiveTooltip(null);
+    } else {
+      const categoryScores = questions.reduce((acc, category) => {
+        const categoryQuestions = category.questions;
+        const categoryScore = categoryQuestions.reduce((sum, question) => {
+          const questionScores = answers[`${question.id}_scores`] || [];
+          return sum + questionScores.reduce((scoreSum, score) => scoreSum + score, 0);
+        }, 0);
+        
+        const maxPossibleScore = categoryQuestions.reduce((sum, question) => {
+          if (question.multiSelect) {
+            const topScores = question.options
+              .map(opt => opt.score)
+              .sort((a, b) => b - a)
+              .slice(0, 3);
+            return sum + topScores.reduce((scoreSum, score) => scoreSum + score, 0);
+          } else {
+            return sum + Math.max(...question.options.map(opt => opt.score));
+          }
+        }, 0);
+
+        return {
+          ...acc,
+          [category.category]: {
+            score: Math.round((categoryScore / maxPossibleScore) * 100),
+            questions: categoryQuestions.map(question => ({
+              id: question.id,
+              scores: answers[`${question.id}_scores`] || []
+            }))
+          }
+        };
+      }, {});
+
+      const totalScore = Object.values(categoryScores).reduce((sum, cat) => sum + cat.score, 0);
+      const averageScore = Math.round(totalScore / Object.keys(categoryScores).length);
+
+      onSubmit({
+        answers,
+        categoryScores,
+        overallScore: averageScore
+      });
+    }
   };
-
-  // In QuestionsPage.jsx, update de handleNext functie:
-const handleNext = () => {
-  if (currentQuestionIndex < flatQuestions.length - 1) {
-    setCurrentQuestionIndex(currentQuestionIndex + 1);
-  } else {
-    // Bereken scores per categorie
-    const categoryScores = questions.reduce((acc, category) => {
-      const categoryQuestions = category.questions;
-      const categoryScore = categoryQuestions.reduce((sum, question) => {
-        const questionScores = answers[`${question.id}_scores`] || [];
-        return sum + questionScores.reduce((scoreSum, score) => scoreSum + score, 0);
-      }, 0);
-      
-      const maxPossibleScore = categoryQuestions.reduce((sum, question) => {
-        if (question.multiSelect) {
-          // Voor multi-select, tel de hoogste mogelijke scores
-          const topScores = question.options
-            .map(opt => opt.score)
-            .sort((a, b) => b - a)
-            .slice(0, 3);
-          return sum + topScores.reduce((scoreSum, score) => scoreSum + score, 0);
-        } else {
-          // Voor single-select, neem de hoogst mogelijke score
-          return sum + Math.max(...question.options.map(opt => opt.score));
-        }
-      }, 0);
-
-      return {
-        ...acc,
-        [category.category]: {
-          score: Math.round((categoryScore / maxPossibleScore) * 100),
-          questions: categoryQuestions.map(question => ({
-            id: question.id,
-            scores: answers[`${question.id}_scores`] || []
-          }))
-        }
-      };
-    }, {});
-
-    const totalScore = Object.values(categoryScores).reduce((sum, cat) => sum + cat.score, 0);
-    const averageScore = Math.round(totalScore / Object.keys(categoryScores).length);
-
-    onSubmit({
-      answers,
-      categoryScores,
-      overallScore: averageScore
-    });
-  }
-};
 
   const handlePrevious = () => {
     if (currentQuestionIndex > 0) {
+      setDirection(-1);
       setCurrentQuestionIndex(currentQuestionIndex - 1);
       setActiveTooltip(null);
     }
@@ -239,15 +236,15 @@ const handleNext = () => {
   const progress = ((currentQuestionIndex + 1) / flatQuestions.length) * 100;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-      {/* Modern header with glass effect */}
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
+      {/* Header */}
       <div className="bg-white/80 backdrop-blur-md border-b border-gray-200 sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
-          <h1 className="text-lg font-semibold bg-gradient-to-r from-[#1e81b0] to-blue-600 bg-clip-text text-transparent">
+          <h1 className="text-xl font-semibold bg-gradient-to-r from-[#1e81b0] to-blue-600 bg-clip-text text-transparent">
             Assessment
           </h1>
           <span className="text-sm text-gray-600">
-            Question {currentQuestionIndex + 1} of {flatQuestions.length}
+            Vraag {currentQuestionIndex + 1} van {flatQuestions.length}
           </span>
         </div>
       </div>
@@ -266,44 +263,32 @@ const handleNext = () => {
 
           {/* Question with Tooltip */}
           <div className="relative mb-8">
-  <div className="flex items-start gap-2 group">
-    <div className="flex-grow">
-      <h2 className="text-xl font-semibold text-gray-900">
-        {currentQuestion.text}
-      </h2>
-    </div>
-    <div className="relative">
-      <HelpCircle 
-        className="w-5 h-5 text-[#1e81b0] hover:text-blue-600 transform hover:scale-110 transition-all duration-200 cursor-help" 
-        onClick={(e) => handleTooltipClick(e, currentQuestion.id)}
-      />
-      
-      {/* Tooltip Content */}
-      {activeTooltip === currentQuestion.id && (
-        <div className="absolute right-0 mt-2 w-80 p-4 bg-white rounded-xl shadow-lg border border-gray-200 
-                      transform transition-all duration-200 ease-out z-20">
-          <div className="relative">
-            {/* Tooltip Arrow */}
-            <div className="absolute -top-2 right-2 w-4 h-4 bg-white border-t border-l border-gray-200 
-                          transform rotate-45 -translate-y-1/2" />
-            
-            {/* Tooltip Content */}
-            <div className="relative bg-white rounded-lg">
-              <div className="text-sm space-y-2">
-                <div className="font-medium text-[#1e81b0]">
-                  Waarom vragen we dit?
-                </div>
-                <p className="text-gray-600 leading-relaxed">
-                  {currentQuestion.tooltip}
-                </p>
+            <div className="flex items-start gap-2">
+              <h2 className="text-xl font-semibold text-gray-900 flex-grow">
+                {currentQuestion.text}
+              </h2>
+              <div className="relative">
+                <HelpCircle 
+                  className="w-5 h-5 text-[#1e81b0] hover:text-blue-600 cursor-help" 
+                  onClick={() => setActiveTooltip(activeTooltip === currentQuestion.id ? null : currentQuestion.id)}
+                />
+                
+                {activeTooltip === currentQuestion.id && (
+                  <div className="absolute right-0 mt-2 w-80 p-4 bg-white rounded-xl shadow-lg border border-gray-200 z-20">
+                    <div className="text-sm space-y-2">
+                      <div className="font-medium text-[#1e81b0]">
+                        Waarom vragen we dit?
+                      </div>
+                      <p className="text-gray-600 leading-relaxed">
+                        {currentQuestion.tooltip}
+                      </p>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>
-        </div>
-      )}
-    </div>
-  </div>
-</div>
+
           {/* Options */}
           <div className="space-y-3">
             {currentQuestion.options.map((option, index) => (
@@ -311,9 +296,8 @@ const handleNext = () => {
                 key={index}
                 onClick={() => handleAnswer(option)}
                 className={`w-full p-4 rounded-xl text-left transition-all duration-200
-                  group relative overflow-hidden
                   ${answers[currentQuestion.id]?.includes(option.text)
-                    ? 'bg-gradient-to-r from-[#1e81b0] to-blue-600 text-white shadow-lg scale-[1.02]'
+                    ? 'bg-gradient-to-r from-[#1e81b0] to-blue-600 text-white shadow-lg scale-105'
                     : 'bg-white hover:bg-gray-50 text-gray-700 border border-gray-200 hover:border-[#1e81b0]/30'
                   }
                 `}
@@ -348,17 +332,16 @@ const handleNext = () => {
                 }`}
             >
               <ArrowLeft className="w-5 h-5 mr-2" />
-              Previous
+              Terug
             </button>
 
             <button
               onClick={handleNext}
-              
               className="flex items-center px-6 py-3 rounded-xl bg-gradient-to-r from-[#1e81b0] to-blue-600 
-                       text-white hover:shadow-lg transform hover:scale-[1.02] 
-                       active:scale-[0.98] transition-all duration-200"
+                       text-white hover:shadow-lg transform hover:scale-105 
+                       active:scale-95 transition-all duration-200"
             >
-              {currentQuestionIndex === flatQuestions.length - 1 ? 'Finish' : 'Next'}
+              {currentQuestionIndex === flatQuestions.length - 1 ? 'Einde' : 'Volgende'}
               <ArrowRight className="w-5 h-5 ml-2" />
             </button>
           </div>
