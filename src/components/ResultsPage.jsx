@@ -108,13 +108,13 @@ const ResultsPage = ({ assessmentResults }) => {
   };
 
   const getMaturityLevel = (score) => {
-    if (score >= 70) return { 
+    if (score >= 65) return { 
       text: 'Gevorderd', 
       color: 'bg-gradient-to-r from-green-500 to-green-600',
       textColor: 'text-green-700',
       bgLight: 'bg-green-50' 
     };
-    if (score >= 50) return { 
+    if (score >= 45) return { 
       text: 'Gemiddeld', 
       color: 'bg-gradient-to-r from-yellow-500 to-yellow-600',
       textColor: 'text-yellow-700',
