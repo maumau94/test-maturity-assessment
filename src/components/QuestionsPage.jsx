@@ -118,7 +118,7 @@ const QuestionsPage = ({ onSubmit }) => {
         },
         {
           id: 9,
-          text: "Hoe lang duurt het om te rapporteren over de kwaliteit van een applicatie of systeem?",
+          text: "Hoelang duurt het om te rapporteren over de kwaliteit van een applicatie of systeem?",
           tooltip: "De snelheid van kwaliteitsrapportage is cruciaal voor continuous testing. Real-time inzicht duidt op een hoogontwikkeld testproces.",
           options: [
             { text: "Meer dan een dag", score: 1 },
